@@ -37,12 +37,26 @@ import os
 EMOJI = "\U0001F31E"  # SUN WITH FACE
 
 
+def validate_emoji(value: str) -> str:
+    """Guard: the result must be exactly one emoji character.
+
+    Exactly one code point, 1-8 bytes in UTF-8, and not whitespace.
+    """
+    if len(value) != 1:
+        raise ValueError(f"expected exactly one character, got {len(value)}")
+    if not 1 <= len(value.encode("utf-8")) <= 8:
+        raise ValueError("emoji must be 1-8 bytes in UTF-8")
+    if value.isspace():
+        raise ValueError("emoji must not be whitespace")
+    return value
+
+
 def main() -> None:
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="") as f:
-        f.write(EMOJI)
+        f.write(validate_emoji(EMOJI))
 
 
 if __name__ == "__main__":
